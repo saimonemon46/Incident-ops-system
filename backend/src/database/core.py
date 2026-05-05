@@ -1,14 +1,31 @@
 import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# In production, this comes from your .env file (e.g., Supabase Postgres connection string)
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/incident_db")
+# Load .env file
+load_dotenv()
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Get DATABASE_URL from .env
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set. Check your .env file.")
+
+# Create engine
+engine = create_engine(DATABASE_URL, echo=True)
+
+# Session
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+# Base model
 Base = declarative_base()
 
+# Dependency
 def get_db():
     db = SessionLocal()
     try:
