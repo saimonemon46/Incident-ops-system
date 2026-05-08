@@ -5,6 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api import api_router
 from src.database.core import engine, Base
 
+
+# Import SQLAlchemy models so metadata.create_all() sees them
+from src.entities.user import User
+from src.entities.incident import Incident
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Create tables if they don't exist
