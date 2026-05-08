@@ -2,6 +2,8 @@ from uuid import UUID
 from fastapi import HTTPException
 
 
+# ── Incident ──────────────────────────────────────────────────────────────────
+
 class IncidentNotFound(HTTPException):
     def __init__(self, incident_id: UUID):
         super().__init__(
@@ -18,6 +20,34 @@ class InvalidSeverity(HTTPException):
         )
 
 
+# ── General ───────────────────────────────────────────────────────────────────
+
 class DatabaseError(HTTPException):
     def __init__(self, detail: str = "A database error occurred"):
         super().__init__(status_code=500, detail=detail)
+
+
+# ── Auth ──────────────────────────────────────────────────────────────────────
+
+class EmailAlreadyExists(HTTPException):
+    def __init__(self, email: str):
+        super().__init__(
+            status_code=409,
+            detail=f"Email '{email}' is already registered"
+        )
+
+
+class UsernameAlreadyExists(HTTPException):
+    def __init__(self, username: str):
+        super().__init__(
+            status_code=409,
+            detail=f"Username '{username}' is already taken"
+        )
+
+
+class InvalidCredentials(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=401,
+            detail="Invalid email or password"
+        )
