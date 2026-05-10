@@ -1,12 +1,12 @@
-from triage.rules import run_rules
-from triage.classifier import embed
-from triage.similarity import search_similar, add_incident
-from triage.models import TriageResult
-from entities.incident import IncidentCategory, Severity
+from src.triage.rules import run_rules
+from src.triage.classifier import embed
+from src.triage.similarity import search_similar, add_incident
+from src.triage.models import TriageResult
+from src.entities.incident import IncidentCategory, Severity
 
 
 def triage_incident(
-    incident_id: int,
+    incident_id: str,
     title: str,
     description: str,
 ) -> TriageResult:

@@ -1,5 +1,6 @@
+from uuid import UUID
 from pydantic import BaseModel
-from entities.incident import IncidentCategory, Severity
+from src.entities.incident import IncidentCategory, Severity
 
 class TriageResult(BaseModel):
     category: IncidentCategory
@@ -9,6 +10,6 @@ class TriageResult(BaseModel):
     confidence: float  # 0.0 - 1.0
 
 class TriageResponse(BaseModel):
-    incident_id: int
+    incident_id: UUID
     triage: TriageResult
     message: str

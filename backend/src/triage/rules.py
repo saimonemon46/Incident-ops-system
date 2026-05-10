@@ -1,4 +1,4 @@
-from entities.incident import IncidentCategory, Severity
+from src.entities.incident import IncidentCategory, Severity
 
 # keyword → (category, severity, suggested_fix)
 RULES = [

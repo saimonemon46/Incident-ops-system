@@ -6,7 +6,7 @@ EMBEDDING_DIM = 384  # all-MiniLM-L6-v2 output size
 
 @dataclass
 class IncidentRecord:
-    incident_id: int
+    incident_id: str
     text: str
     suggested_fix: str
 
@@ -22,7 +22,7 @@ def get_index() -> FAISSIndex:
     return _faiss_index
 
 
-def add_incident(incident_id: int, text: str, suggested_fix: str, embedding: np.ndarray):
+def add_incident(incident_id: str, text: str, suggested_fix: str, embedding: np.ndarray):
     idx = get_index()
     vec = embedding.reshape(1, -1).astype("float32")
     idx.index.add(vec)

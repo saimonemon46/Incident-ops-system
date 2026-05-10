@@ -1,7 +1,13 @@
-from sqlalchemy import Column, Integer, String, Text, Enum as SQLEnum, DateTime
-from sqlalchemy.sql import func
-from src.database.core import Base
+import uuid
 import enum
+from datetime import datetime
+
+from sqlalchemy import Column, String, Text, Enum as SQLEnum, DateTime
+from sqlalchemy.sql import func
+from sqlalchemy.dialects.postgresql import UUID
+
+from src.database.core import Base
+
 
 class Severity(str, enum.Enum):
     LOW = "LOW"
@@ -25,7 +31,7 @@ class IncidentCategory(str, enum.Enum):
 class Incident(Base):
     __tablename__ = "incidents"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     title = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     severity = Column(SQLEnum(Severity), default=Severity.LOW, nullable=False)
