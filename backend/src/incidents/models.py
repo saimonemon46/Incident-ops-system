@@ -24,11 +24,11 @@ class IncidentUpdate(BaseModel):
 class IncidentResponse(BaseModel):
     id: UUID
     title: str
-    description: str
+    description: Optional[str] = None
     severity: Severity
     status: Status
-    assigned_to: Optional[str]
+    assigned_to: Optional[str] = None
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
