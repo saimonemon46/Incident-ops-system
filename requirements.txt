@@ -13,3 +13,8 @@ email-validator
 sentence-transformers
 faiss-cpu
 numpy
+
+celery
+redis
+sendgrid
+httpx           ← for Slack webhook HTTP call
