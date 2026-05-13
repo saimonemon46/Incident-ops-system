@@ -8,11 +8,39 @@ from src.incidents.models import IncidentCreate, IncidentUpdate
 from src.exceptions import IncidentNotFound
 
 
+# add this import at top of service.py
+from datetime import datetime, timezone
+from notifications.tasks import notify_incident
+from notifications.sla import get_sla_deadline
+from entities.incident import Severity
+
+
 def create_incident(db: Session, data: IncidentCreate) -> Incident:
     incident = Incident(**data.model_dump())
     db.add(incident)
     db.commit()
     db.refresh(incident)
+    
+
+
+    # fire notification for HIGH + CRITICAL only
+    if incident.severity in (Severity.HIGH, Severity.CRITICAL):
+        # set SLA deadline
+        incident.sla_deadline = get_sla_deadline(incident.severity)
+        incident.notified_at = datetime.now(timezone.utc)
+        db.commit()
+
+        notify_incident.delay(
+            incident_id=incident.id,
+            title=incident.title,
+            severity=incident.severity,
+            category=str(incident.category) if incident.category else "UNKNOWN",
+            suggested_fix=incident.suggested_fix or "",
+            assigned_to=incident.assigned_to,
+            engineer_email=None,  # Phase 5: resolve from users table
+        )
+        
+        
     return incident
 
 
@@ -35,3 +63,5 @@ def update_incident(db: Session, incident_id: UUID, data: IncidentUpdate) -> Inc
     db.commit()
     db.refresh(incident)
     return incident
+
+
