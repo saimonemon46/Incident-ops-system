@@ -8,7 +8,7 @@ python-jose[cryptography]
 psycopg2-binary
 pydantic[email]
 alembic
-bcrypt
+bcrypt<5
 email-validator
 sentence-transformers
 faiss-cpu
@@ -17,3 +17,4 @@ celery
 redis
 sendgrid
 httpx
+pytest
