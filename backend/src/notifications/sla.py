@@ -1,18 +1,22 @@
-import os
 from datetime import datetime, timezone
 from src.entities.incident import Severity
+from src.config import get_settings
+
+settings = get_settings()
 
 SLA_MINUTES = {
-    Severity.CRITICAL: int(os.getenv("SLA_CRITICAL_MINUTES", 15)),
-    Severity.HIGH: int(os.getenv("SLA_HIGH_MINUTES", 60)),
+    Severity.CRITICAL: settings.sla_critical_minutes,
+    Severity.HIGH: settings.sla_high_minutes,
     Severity.MEDIUM: 240,
     Severity.LOW: 1440,
 }
 
 
-def get_sla_deadline(severity: str) -> datetime:
+def get_sla_deadline(severity: Severity | str) -> datetime:
     from datetime import timedelta
-    minutes = SLA_MINUTES.get(severity, 240)
+
+    severity_key = severity if isinstance(severity, Severity) else Severity(severity)
+    minutes = SLA_MINUTES.get(severity_key, 240)
     return datetime.now(timezone.utc) + timedelta(minutes=minutes)
 
 

@@ -3,15 +3,10 @@ from src.notifications.slack import send_slack_alert, send_slack_sla_breach
 from src.notifications.email import send_email_alert, send_email_sla_breach
 from src.notifications.sla import is_sla_breached
 
-import os
-import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-
-@celery.task(name="notifications.tasks.notify_incident")
+@celery.task(name="src.notifications.tasks.notify_incident")
 def notify_incident(
-    incident_id: int,
+    incident_id: str,
     title: str,
     severity: str,
     category: str,
@@ -42,12 +37,11 @@ def notify_incident(
     print(f"[Tasks] Notifications sent for incident #{incident_id}")
 
 
-@celery.task(name="notifications.tasks.check_sla_breaches")
+@celery.task(name="src.notifications.tasks.check_sla_breaches")
 def check_sla_breaches():
     """Runs every 5 min via celery beat. Checks all open incidents for SLA breach."""
-    from database.core import SessionLocal
-    from entities.incident import Incident, Status
-    from datetime import datetime, timezone
+    from src.database.core import SessionLocal
+    from src.entities.incident import Incident, Status
 
     db = SessionLocal()
     try:
@@ -56,7 +50,7 @@ def check_sla_breaches():
             .filter(
                 Incident.status != Status.RESOLVED,
                 Incident.sla_deadline.isnot(None),
-                Incident.sla_breached == False,
+                Incident.sla_breached.is_(False),
             )
             .all()
         )
@@ -68,15 +62,15 @@ def check_sla_breaches():
                 db.commit()
 
                 send_slack_sla_breach(
-                    incident_id=incident.id,
+                    incident_id=str(incident.id),
                     title=incident.title,
-                    severity=incident.severity,
+                    severity=incident.severity.value,
                 )
 
                 if incident.assigned_to:
                     send_email_sla_breach(
                         to_email=incident.assigned_to,
-                        incident_id=incident.id,
+                        incident_id=str(incident.id),
                         title=incident.title,
                     )
 

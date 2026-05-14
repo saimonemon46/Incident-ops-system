@@ -3,17 +3,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api import api_router
+from src.config import get_settings
 from src.database.core import engine, Base
 
 
-# Import SQLAlchemy models so metadata.create_all() sees them
+# Import SQLAlchemy models so optional local table creation sees them.
+# Production should run Alembic migrations instead.
 from src.entities.user import User
 from src.entities.incident import Incident
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create tables if they don't exist
-    Base.metadata.create_all(bind=engine)
+    settings = get_settings()
+    if settings.create_tables_on_startup:
+        Base.metadata.create_all(bind=engine)
     yield
 
 

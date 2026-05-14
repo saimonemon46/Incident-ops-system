@@ -1,40 +1,41 @@
-import os
 import httpx
+
+from src.config import get_settings
 from src.entities.incident import Severity
 
-SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
+settings = get_settings()
 
-SEVERITY_EMOJI = {
-    Severity.CRITICAL: "🔴",
-    Severity.HIGH: "🟠",
-    Severity.MEDIUM: "🟡",
-    Severity.LOW: "🟢",
+SEVERITY_LABEL = {
+    Severity.CRITICAL.value: "[CRITICAL]",
+    Severity.HIGH.value: "[HIGH]",
+    Severity.MEDIUM.value: "[MEDIUM]",
+    Severity.LOW.value: "[LOW]",
 }
 
 
 def send_slack_alert(
-    incident_id: int,
+    incident_id: str,
     title: str,
     severity: str,
     category: str,
     suggested_fix: str,
     assigned_to: str | None,
 ) -> bool:
-    if not SLACK_WEBHOOK_URL:
+    if not settings.slack_webhook_url:
         print("[Slack] No webhook URL configured. Skipping.")
         return False
 
-    emoji = SEVERITY_EMOJI.get(severity, "⚪")
+    severity_label = SEVERITY_LABEL.get(severity, "[UNKNOWN]")
     assignee = assigned_to or "Unassigned"
 
     payload = {
-        "text": f"{emoji} *INCIDENT ALERT* {emoji}",
+        "text": f"{severity_label} INCIDENT ALERT",
         "blocks": [
             {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": f"{emoji} Incident #{incident_id} — {severity}",
+                    "text": f"{severity_label} Incident #{incident_id}",
                 },
             },
             {
@@ -66,24 +67,27 @@ def send_slack_alert(
     }
 
     try:
-        response = httpx.post(SLACK_WEBHOOK_URL, json=payload, timeout=5.0)
+        response = httpx.post(settings.slack_webhook_url, json=payload, timeout=5.0)
         return response.status_code == 200
-    except Exception as e:
-        print(f"[Slack] Failed to send alert: {e}")
+    except Exception as exc:
+        print(f"[Slack] Failed to send alert: {exc}")
         return False
 
 
-def send_slack_sla_breach(incident_id: int, title: str, severity: str) -> bool:
-    if not SLACK_WEBHOOK_URL:
+def send_slack_sla_breach(incident_id: str, title: str, severity: str) -> bool:
+    if not settings.slack_webhook_url:
         return False
 
     payload = {
-        "text": f"🚨 *SLA BREACHED* — Incident #{incident_id} ({severity}): {title}\nNo update received in time. Escalating now."
+        "text": (
+            f"[SLA BREACHED] Incident #{incident_id} ({severity}): {title}\n"
+            "No update received in time. Escalating now."
+        )
     }
 
     try:
-        response = httpx.post(SLACK_WEBHOOK_URL, json=payload, timeout=5.0)
+        response = httpx.post(settings.slack_webhook_url, json=payload, timeout=5.0)
         return response.status_code == 200
-    except Exception as e:
-        print(f"[Slack] SLA breach alert failed: {e}")
+    except Exception as exc:
+        print(f"[Slack] SLA breach alert failed: {exc}")
         return False

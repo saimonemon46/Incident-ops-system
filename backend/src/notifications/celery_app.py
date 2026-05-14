@@ -1,13 +1,14 @@
-import os
 from celery import Celery
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+from src.config import get_settings
+
+settings = get_settings()
 
 celery = Celery(
     "incident_ops",
-    broker=REDIS_URL,
-    backend=REDIS_URL,
-    include=["notifications.tasks"],
+    broker=settings.redis_url,
+    backend=settings.redis_url,
+    include=["src.notifications.tasks"],
 )
 
 celery.conf.update(
@@ -19,7 +20,7 @@ celery.conf.update(
     # SLA check runs every 5 minutes
     beat_schedule={
         "check-sla-breaches": {
-            "task": "notifications.tasks.check_sla_breaches",
+            "task": "src.notifications.tasks.check_sla_breaches",
             "schedule": 300.0,  # every 5 min
         }
     },
