@@ -1,7 +1,29 @@
-version: '3.9'
-
 services:
-  backend:
-    build: .
-    ports:
-      - "8000:8000"
+  api:
+    extends:
+      file: ../docker-compose.yml
+      service: api
+
+  celery-worker:
+    extends:
+      file: ../docker-compose.yml
+      service: celery-worker
+
+  celery-beat:
+    extends:
+      file: ../docker-compose.yml
+      service: celery-beat
+
+  postgres:
+    extends:
+      file: ../docker-compose.yml
+      service: postgres
+
+  redis:
+    extends:
+      file: ../docker-compose.yml
+      service: redis
+
+volumes:
+  postgres_data:
+  redis_data:

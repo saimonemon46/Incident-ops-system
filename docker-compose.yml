@@ -1,0 +1,93 @@
+x-backend-build: &backend-build
+  context: .
+  dockerfile: backend/Dockerfile
+
+x-backend-env: &backend-env
+  DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/incidents_db
+  JWT_SECRET: change-me-in-production
+  ACCESS_TOKEN_EXPIRE_MINUTES: "1440"
+  ENVIRONMENT: development
+  DATABASE_ECHO: "false"
+  CREATE_TABLES_ON_STARTUP: "false"
+  REDIS_URL: redis://redis:6379/0
+  SLACK_WEBHOOK_URL: ""
+  SENDGRID_API_KEY: ""
+  SENDGRID_FROM_EMAIL: alerts@yourapp.com
+  SLA_CRITICAL_MINUTES: "15"
+  SLA_HIGH_MINUTES: "60"
+
+x-backend-depends-on: &backend-depends-on
+  postgres:
+    condition: service_healthy
+  redis:
+    condition: service_healthy
+
+services:
+  api:
+    build: *backend-build
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn src.main:app --host 0.0.0.0 --port 8000"
+    environment: *backend-env
+    ports:
+      - "8000:8000"
+    depends_on: *backend-depends-on
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  celery-worker:
+    build: *backend-build
+    command: celery -A src.notifications.celery_app:celery worker --loglevel=info
+    environment: *backend-env
+    depends_on: *backend-depends-on
+    restart: unless-stopped
+
+  celery-beat:
+    build: *backend-build
+    command: celery -A src.notifications.celery_app:celery beat --loglevel=info
+    environment: *backend-env
+    depends_on: *backend-depends-on
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: incidents_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d incidents_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
