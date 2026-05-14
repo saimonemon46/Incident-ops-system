@@ -1,0 +1,29 @@
+export function formatRelativeTime(value) {
+  if (!value) {
+    return 'No timestamp';
+  }
+
+  const date = new Date(value);
+  const diff = Date.now() - date.getTime();
+  const minutes = Math.max(1, Math.round(diff / 60000));
+
+  if (minutes < 60) {
+    return `${minutes}m ago`;
+  }
+
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
+
+  return `${Math.round(hours / 24)}d ago`;
+}
+
+export function formatClockTime(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  return [hours, minutes, seconds].map((part) => String(part).padStart(2, '0')).join(':');
+}

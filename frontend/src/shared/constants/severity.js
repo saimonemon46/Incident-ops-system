@@ -1,0 +1,8 @@
+export const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+
+export const SLA_MINUTES_BY_SEVERITY = {
+  CRITICAL: 30,
+  HIGH: 120,
+  MEDIUM: 480,
+  LOW: 1440,
+};

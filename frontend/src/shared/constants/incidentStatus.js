@@ -1,0 +1,1 @@
+export const INCIDENT_STATUSES = ['OPEN', 'IN_PROGRESS', 'RESOLVED'];
