@@ -1,7 +1,7 @@
-from notifications.celery_app import celery
-from notifications.slack import send_slack_alert, send_slack_sla_breach
-from notifications.email import send_email_alert, send_email_sla_breach
-from notifications.sla import is_sla_breached
+from src.notifications.celery_app import celery
+from src.notifications.slack import send_slack_alert, send_slack_sla_breach
+from src.notifications.email import send_email_alert, send_email_sla_breach
+from src.notifications.sla import is_sla_breached
 
 import os
 import sys

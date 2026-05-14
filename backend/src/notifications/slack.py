@@ -1,6 +1,6 @@
 import os
 import httpx
-from entities.incident import Severity
+from src.entities.incident import Severity
 
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
 

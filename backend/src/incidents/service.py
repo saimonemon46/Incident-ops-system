@@ -3,16 +3,15 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from src.entities.incident import Incident
+from src.entities.incident import Incident,Severity
 from src.incidents.models import IncidentCreate, IncidentUpdate
 from src.exceptions import IncidentNotFound
 
 
 # add this import at top of service.py
 from datetime import datetime, timezone
-from notifications.tasks import notify_incident
-from notifications.sla import get_sla_deadline
-from entities.incident import Severity
+from src.notifications.tasks import notify_incident
+from src.notifications.sla import get_sla_deadline
 
 
 def create_incident(db: Session, data: IncidentCreate) -> Incident:

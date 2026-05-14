@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timezone
-from entities.incident import Severity
+from src.entities.incident import Severity
 
 SLA_MINUTES = {
     Severity.CRITICAL: int(os.getenv("SLA_CRITICAL_MINUTES", 15)),
