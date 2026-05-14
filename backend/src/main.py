@@ -1,32 +1,15 @@
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api import api_router
-from src.config import get_settings
-from src.database.core import engine, Base
-
-
-# Import SQLAlchemy models so optional local table creation sees them.
-# Production should run Alembic migrations instead.
-from src.entities.user import User
-from src.entities.incident import Incident
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    settings = get_settings()
-    if settings.create_tables_on_startup:
-        Base.metadata.create_all(bind=engine)
-    yield
 
 
 app = FastAPI(
     title="Incident Ops System",
-    description="Real-time incident management — Phase 1",
+    description="Real-time incident management - Phase 1",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    lifespan=lifespan,
 )
 
 app.add_middleware(

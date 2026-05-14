@@ -40,7 +40,6 @@ class Settings:
     access_token_expire_minutes: int
     environment: str
     database_echo: bool
-    create_tables_on_startup: bool
     redis_url: str
     slack_webhook_url: str
     sendgrid_api_key: str
@@ -57,7 +56,6 @@ def get_settings() -> Settings:
         access_token_expire_minutes=_int("ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24),
         environment=_optional("ENVIRONMENT", "development"),
         database_echo=_bool("DATABASE_ECHO", False),
-        create_tables_on_startup=_bool("CREATE_TABLES_ON_STARTUP", False),
         redis_url=_optional("REDIS_URL", "redis://localhost:6379/0"),
         slack_webhook_url=_optional("SLACK_WEBHOOK_URL"),
         sendgrid_api_key=_optional("SENDGRID_API_KEY"),

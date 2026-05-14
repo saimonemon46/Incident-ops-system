@@ -26,9 +26,9 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # ── Import ALL models so Base.metadata sees every table ──
-from backend.src.database.core import Base          # noqa: E402
-from backend.src.entities.user import User          # noqa: E402
-from backend.src.entities.incident import Incident  # noqa: E402
+from src.database.core import Base          # noqa: E402
+from src.entities.user import User          # noqa: E402,F401
+from src.entities.incident import Incident  # noqa: E402,F401
 
 target_metadata = Base.metadata
 

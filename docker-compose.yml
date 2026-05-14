@@ -8,7 +8,6 @@ x-backend-env: &backend-env
   ACCESS_TOKEN_EXPIRE_MINUTES: "1440"
   ENVIRONMENT: development
   DATABASE_ECHO: "false"
-  CREATE_TABLES_ON_STARTUP: "false"
   REDIS_URL: redis://redis:6379/0
   SLACK_WEBHOOK_URL: ""
   SENDGRID_API_KEY: ""
